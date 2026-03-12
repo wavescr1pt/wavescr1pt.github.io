@@ -3,59 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <title>WaveScript 1.0</title>
-    <link rel="icon" href="data:,">
     <style>
         :root { --bg: #0d0d0d; --panel: #141414; --accent: #0081ff; --border: #222; --text-main: #e0e0e0; --text-sub: #666; --editor-text: #b3d9ff; }
         body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .nav-bar { height: 48px; background: var(--panel); display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid var(--border); z-index: 100; gap: 16px; }
-        .brand-section { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .brand-section { display: flex; align-items: center; gap: 10px; }
         .ws-logo { height: 20px; width: auto; }
         .brand-name { font-size: 13px; font-weight: 700; color: #fff; }
-        .project-meta { display: flex; align-items: center; flex-grow: 1; max-width: 300px; }
-        #project-name { background: #1a1a1a; border: 1px solid var(--border); color: var(--text-main); padding: 5px 12px; border-radius: 4px; font-size: 12px; width: 100%; outline: none; }
+        #project-name { background: #1a1a1a; border: 1px solid var(--border); color: var(--text-main); padding: 5px 12px; border-radius: 4px; font-size: 12px; width: 200px; outline: none; }
         .controls { display: flex; gap: 8px; margin-left: auto; }
-        .btn { border: none; padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; color: #fff; transition: 0.2s; }
-        .btn-save { background: #333; }
+        .btn { border: none; padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; color: #fff; }
         .btn-export { background: var(--accent); }
         main { flex: 1; display: flex; overflow: hidden; }
         .pane { flex: 1; display: flex; flex-direction: column; }
-        .pane-preview { flex: 1.1; border-left: 1px solid var(--border); }
+        .pane-preview { flex: 1.2; border-left: 1px solid var(--border); }
         .pane-header { font-size: 10px; font-weight: 800; color: var(--text-sub); padding: 10px 20px; text-transform: uppercase; background: var(--panel); border-bottom: 1px solid var(--border); }
-        textarea { flex: 1; background: transparent; color: var(--editor-text); border: none; padding: 24px; font-family: 'Fira Code', monospace; font-size: 14px; line-height: 1.6; outline: none; resize: none; }
+        textarea { flex: 1; background: transparent; color: var(--editor-text); border: none; padding: 24px; font-family: 'Consolas', monospace; font-size: 14px; line-height: 1.6; outline: none; resize: none; }
         .canvas-container { flex: 1; overflow-y: auto; background: #fff; }
         #canvas { width: 100%; min-height: 100%; color: #000; display: flex; flex-direction: column; }
         
-        /* プレビュー用基本スタイル */
-        .ws-h { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; position: sticky; top: 0; z-index: 10; backdrop-filter: blur(12px); min-height: 64px; box-sizing: border-box; }
+        /* Components */
+        .ws-h { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; min-height: 64px; box-sizing: border-box; }
         .ws-h-right { display: flex; gap: 12px; align-items: center; }
         .hb { text-decoration: none; font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 6px; background: #0081ff; color: #fff; }
-        .ws-h.as-link .hb { background: transparent !important; color: inherit !important; padding: 4px 8px !important; }
-        section { box-sizing: border-box; display: flex; flex-direction: column; white-space: pre-line; background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #eee; } /* デフォルト背景色を追加 */
-        img { max-width: 100%; height: auto; display: block; }
+        section { box-sizing: border-box; display: flex; flex-direction: column; white-space: pre-line; background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #eee; }
     </style>
 </head>
 <body>
 <div class="nav-bar">
     <div class="brand-section">
-        <svg class="ws-logo" viewBox="0 0 128 128" fill="none"><rect width="128" height="128" fill="white"/><rect width="128" height="24" fill="#0081FF"/><circle cx="16" cy="12" r="6" fill="white"/><circle cx="36" cy="12" r="6" fill="white"/><rect y="24" width="128" height="56" fill="#3D3D3D"/><path d="M12.8 71.68V128H28.416L34.176 100.224L39.808 128H55.424V71.68H43.008V111.872L36.864 82.304H31.36L25.216 111.872V71.68H12.8ZM61.824 116.352L72.448 111.36C73.984 116.096 77.568 118.912 82.816 118.912C88.064 118.912 91.392 116.736 91.392 113.152C91.392 110.08 89.6 108.032 83.328 106.368L77.056 104.704C68.352 102.336 63.872 98.496 63.872 90.944C63.872 82.24 71.296 76.224 82.176 76.224C92.416 76.224 99.456 81.6 100.992 90.56L90.752 94.784C89.472 90.688 86.656 86.912 81.536 86.912C77.056 86.912 74.56 89.088 74.56 91.904C74.56 94.592 76.224 96.128 82.56 97.792L88.832 99.456C98.048 101.888 102.272 105.856 102.272 112.512C102.272 122.24 94.336 129.28 82.432 129.28C71.04 129.28 63.232 123.648 61.824 116.352Z" fill="black"/></svg>
+        <svg class="ws-logo" viewBox="0 0 128 128"><rect width="128" height="128" fill="white"/><rect width="128" height="24" fill="#0081FF"/><rect y="24" width="128" height="56" fill="#3D3D3D"/><path d="M12.8 71.68V128H28.416L34.176 100.224L39.808 128H55.424V71.68H43.008V111.872L36.864 82.304H31.36L25.216 111.872V71.68H12.8ZM61.824 116.352L72.448 111.36C73.984 116.096 77.568 118.912 82.816 118.912C88.064 118.912 91.392 116.736 91.392 113.152C91.392 110.08 89.6 108.032 83.328 106.368L77.056 104.704C68.352 102.336 63.872 98.496 63.872 90.944C63.872 82.24 71.296 76.224 82.176 76.224C92.416 76.224 99.456 81.6 100.992 90.56L90.752 94.784C89.472 90.688 86.656 86.912 81.536 86.912C77.056 86.912 74.56 89.088 74.56 91.904C74.56 94.592 76.224 96.128 82.56 97.792L88.832 99.456C98.048 101.888 102.272 105.856 102.272 112.512C102.272 122.24 94.336 129.28 82.432 129.28C71.04 129.28 63.232 123.648 61.824 116.352Z" fill="black"/></svg>
         <span class="brand-name">WaveScript</span>
     </div>
-    <div class="project-meta"><input type="text" id="project-name" value="Untitled Project"></div>
+    <div class="project-meta"><input type="text" id="project-name" value="Production V1"></div>
     <div class="controls">
-        <button class="btn btn-save" onclick="saveProject()">Save</button>
-        <button class="btn btn-export" onclick="exportToHTML()">Export HTML</button>
+        <button class="btn btn-export" onclick="exportToHTML()">Export</button>
     </div>
 </div>
 <main>
     <div class="pane"><div class="pane-header">Editor</div><textarea id="editor" spellcheck="false">
 +header/WaveScript/hb:Docs:#
-s/h:72/background:#fff/border-bottom:1px solid #eee/hb:link
+s/h:72/background:#fff/border-bottom:1px solid #eee
 
-+section/WaveScript Hero
-s/h:500/bgimg:https://picsum.photos/1200/800/color:#fff/display:flex/align-items:center/justify-content:center/font-size:3.5rem/font-weight:900
++section/WaveScript 1.0
+s/h:500/bgimg:"https://images.unsplash.com/photo-1550684848-fac1c5b4e853"/color:#fff/display:flex/align-items:center/justify-content:center/font-size:3.5rem/font-weight:900
 
-+section/背景画像とセクション幅のテスト。
-s/padding:60px/text-align:center/background:#fff/color:#333/font-size:1.2rem
++section/Quoted URLs are safe!
+s/padding:80px/text-align:center/background:#fff/color:#333/font-size:1.5rem
 </textarea></div>
     <div class="pane pane-preview"><div class="pane-header">Preview</div><div class="canvas-container"><div id="canvas"></div></div></div>
 </main>
@@ -92,28 +86,28 @@ s/padding:60px/text-align:center/background:#fff/color:#333/font-size:1.2rem
                     }
                     el.appendChild(left); el.appendChild(right);
                 } else if (type === 'img') {
-                    el = document.createElement('img'); el.src = contentStr;
+                    el = document.createElement('img'); el.src = contentStr.replace(/"/g, '');
                 } else {
                     el = document.createElement('section');
                     el.innerText = contentStr.split('\\n').join('\n');
                 }
                 canvas.appendChild(el); lastEl = el;
             } else if (l.startsWith('s/') && lastEl) {
-                // スラッシュで分割するが、空文字を除去
-                const segs = l.slice(2).split('/').filter(s => s.length > 0);
+                // 正規表現で「"で囲まれた部分」または「/」で分割
+                const segs = l.slice(2).match(/(".*?"|[^/ \t]+)+/g);
+                if (!segs) return;
+
                 segs.forEach(seg => {
                     const colonIdx = seg.indexOf(':');
                     if (colonIdx === -1) return;
                     let k = seg.slice(0, colonIdx).trim();
-                    let v = seg.slice(colonIdx + 1).trim();
+                    let v = seg.slice(colonIdx + 1).trim().replace(/"/g, ''); // クォーテーションを除去
 
                     if (k === 'bgimg') { 
-                        lastEl.style.backgroundImage = `url("${v}")`; 
+                        lastEl.style.backgroundImage = `url("${v}")`;
                         return; 
                     }
                     if (k === 'h') k = 'height';
-                    
-                    // 数値のみの場合はpxを補完
                     if (v.match(/^\d+$/)) v += 'px';
                     lastEl.style[k] = v;
                 });
@@ -121,23 +115,14 @@ s/padding:60px/text-align:center/background:#fff/color:#333/font-size:1.2rem
         });
     }
 
-    function saveProject() {
-        localStorage.setItem('ws_v1_code', editor.value);
-        alert('Saved!');
-    }
-
     function exportToHTML() {
-        const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>WaveScript</title><style>body{margin:0;font-family:sans-serif;}#canvas{display:flex;flex-direction:column;}.ws-h{display:flex;align-items:center;justify-content:space-between;padding:0 24px;min-height:64px;box-sizing:border-box;}.hb{text-decoration:none;padding:8px 18px;border-radius:6px;background:#0081ff;color:#fff;}.ws-h.as-link .hb{background:transparent!important;color:inherit!important;}section{box-sizing:border-box;display:flex;flex-direction:column;white-space:pre-line;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#eee;}img{max-width:100%;display:block;}</style></head><body><div id="canvas">${canvas.innerHTML}</div></body></html>`;
+        const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>WaveScript</title><style>body{margin:0;font-family:sans-serif;}#canvas{display:flex;flex-direction:column;}.ws-h{display:flex;align-items:center;justify-content:space-between;padding:0 24px;min-height:64px;box-sizing:border-box;}.hb{text-decoration:none;padding:8px 18px;border-radius:6px;background:#0081ff;color:#fff;}section{box-sizing:border-box;display:flex;flex-direction:column;white-space:pre-line;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#eee;}img{max-width:100%;display:block;}</style></head><body><div id="canvas">${canvas.innerHTML}</div></body></html>`;
         const blob = new Blob([fullHTML], {type:'text/html'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'wavescript.html'; a.click();
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'index.html'; a.click();
     }
 
     editor.addEventListener('input', compile);
-    window.onload = () => {
-        const saved = localStorage.getItem('ws_v1_code');
-        if(saved) editor.value = saved;
-        compile();
-    };
+    window.onload = compile;
 </script>
 </body>
 </html>
