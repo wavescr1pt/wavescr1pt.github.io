@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>WaveScript 1.0</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' fill='white'/%3E%3Crect width='128' height='24' fill='%230081FF'/%3E%3Ccircle cx='16' cy='12' r='6' fill='white'/%3E%3Ccircle cx='36' cy='12' r='6' fill='white'/%3E%3Crect y='24' width='128' height='56' fill='%233D3D3D'/%3E%3Cpath d='M12.8 71.68V128H28.416L34.176 100.224L39.808 128H55.424V71.68H43.008V111.872L36.864 82.304H31.36L25.216 111.872V71.68H12.8ZM61.824 116.352L72.448 111.36C73.984 116.096 77.568 118.912 82.816 118.912C88.064 118.912 91.392 116.736 91.392 113.152C91.392 110.08 89.6 108.032 83.328 106.368L77.056 104.704C68.352 102.336 63.872 98.496 63.872 90.944C63.872 82.24 71.296 76.224 82.176 76.224C92.416 76.224 99.456 81.6 100.992 90.56L90.752 94.784C89.472 90.688 86.656 86.912 81.536 86.912C77.056 86.912 74.56 89.088 74.56 91.904C74.56 94.592 76.224 96.128 82.56 97.792L88.832 99.456C98.048 101.888 102.272 105.856 102.272 112.512C102.272 122.24 94.336 129.28 82.432 129.28C71.04 129.28 63.232 123.648 61.824 116.352Z' fill='black'/%3E%3C/svg%3E">
+    <link rel="icon" href="data:,">
     <style>
         :root { --bg: #0d0d0d; --panel: #141414; --accent: #0081ff; --border: #222; --text-main: #e0e0e0; --text-sub: #666; --editor-text: #b3d9ff; }
         body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -16,159 +16,128 @@
         .controls { display: flex; gap: 8px; margin-left: auto; }
         .btn { border: none; padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; color: #fff; transition: 0.2s; }
         .btn-save { background: #333; }
-        .btn-save:hover { background: #444; }
         .btn-export { background: var(--accent); }
-        .btn-export:hover { opacity: 0.9; }
         main { flex: 1; display: flex; overflow: hidden; }
         .pane { flex: 1; display: flex; flex-direction: column; }
         .pane-preview { flex: 1.1; border-left: 1px solid var(--border); }
         .pane-header { font-size: 10px; font-weight: 800; color: var(--text-sub); padding: 10px 20px; text-transform: uppercase; background: var(--panel); border-bottom: 1px solid var(--border); }
-        textarea { flex: 1; background: transparent; color: var(--editor-text); border: none; padding: 24px; font-family: 'Fira Code', monospace; font-size: 13px; line-height: 1.7; outline: none; resize: none; }
+        textarea { flex: 1; background: transparent; color: var(--editor-text); border: none; padding: 24px; font-family: 'Fira Code', monospace; font-size: 14px; line-height: 1.6; outline: none; resize: none; }
         .canvas-container { flex: 1; overflow-y: auto; background: #fff; }
         #canvas { width: 100%; min-height: 100%; color: #000; display: flex; flex-direction: column; }
-
-        /* WaveScript Components */
-        .ws-h { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; position: sticky; top: 0; z-index: 10; backdrop-filter: blur(12px); min-height: 64px; box-sizing: border-box; width: 100%; }
+        
+        /* プレビュー用基本スタイル */
+        .ws-h { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; position: sticky; top: 0; z-index: 10; backdrop-filter: blur(12px); min-height: 64px; box-sizing: border-box; }
         .ws-h-right { display: flex; gap: 12px; align-items: center; }
         .hb { text-decoration: none; font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 6px; background: #0081ff; color: #fff; }
         .ws-h.as-link .hb { background: transparent !important; color: inherit !important; padding: 4px 8px !important; }
-        section { box-sizing: border-box; display: flex; flex-direction: column; white-space: pre-line; position: relative; }
+        section { box-sizing: border-box; display: flex; flex-direction: column; white-space: pre-line; background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #eee; } /* デフォルト背景色を追加 */
+        img { max-width: 100%; height: auto; display: block; }
     </style>
 </head>
 <body>
-
 <div class="nav-bar">
     <div class="brand-section">
-        <svg class="ws-logo" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="128" height="128" fill="white"/><rect width="128" height="24" fill="#0081FF"/><circle cx="16" cy="12" r="6" fill="white"/><circle cx="36" cy="12" r="6" fill="white"/><rect y="24" width="128" height="56" fill="#3D3D3D"/><path d="M12.8 71.68V128H28.416L34.176 100.224L39.808 128H55.424V71.68H43.008V111.872L36.864 82.304H31.36L25.216 111.872V71.68H12.8ZM61.824 116.352L72.448 111.36C73.984 116.096 77.568 118.912 82.816 118.912C88.064 118.912 91.392 116.736 91.392 113.152C91.392 110.08 89.6 108.032 83.328 106.368L77.056 104.704C68.352 102.336 63.872 98.496 63.872 90.944C63.872 82.24 71.296 76.224 82.176 76.224C92.416 76.224 99.456 81.6 100.992 90.56L90.752 94.784C89.472 90.688 86.656 86.912 81.536 86.912C77.056 86.912 74.56 89.088 74.56 91.904C74.56 94.592 76.224 96.128 82.56 97.792L88.832 99.456C98.048 101.888 102.272 105.856 102.272 112.512C102.272 122.24 94.336 129.28 82.432 129.28C71.04 129.28 63.232 123.648 61.824 116.352Z" fill="black"/></svg>
+        <svg class="ws-logo" viewBox="0 0 128 128" fill="none"><rect width="128" height="128" fill="white"/><rect width="128" height="24" fill="#0081FF"/><circle cx="16" cy="12" r="6" fill="white"/><circle cx="36" cy="12" r="6" fill="white"/><rect y="24" width="128" height="56" fill="#3D3D3D"/><path d="M12.8 71.68V128H28.416L34.176 100.224L39.808 128H55.424V71.68H43.008V111.872L36.864 82.304H31.36L25.216 111.872V71.68H12.8ZM61.824 116.352L72.448 111.36C73.984 116.096 77.568 118.912 82.816 118.912C88.064 118.912 91.392 116.736 91.392 113.152C91.392 110.08 89.6 108.032 83.328 106.368L77.056 104.704C68.352 102.336 63.872 98.496 63.872 90.944C63.872 82.24 71.296 76.224 82.176 76.224C92.416 76.224 99.456 81.6 100.992 90.56L90.752 94.784C89.472 90.688 86.656 86.912 81.536 86.912C77.056 86.912 74.56 89.088 74.56 91.904C74.56 94.592 76.224 96.128 82.56 97.792L88.832 99.456C98.048 101.888 102.272 105.856 102.272 112.512C102.272 122.24 94.336 129.28 82.432 129.28C71.04 129.28 63.232 123.648 61.824 116.352Z" fill="black"/></svg>
         <span class="brand-name">WaveScript</span>
     </div>
-    <div class="project-meta">
-        <input type="text" id="project-name" placeholder="作品名を入力..." value="Untitled Project">
-    </div>
+    <div class="project-meta"><input type="text" id="project-name" value="Untitled Project"></div>
     <div class="controls">
         <button class="btn btn-save" onclick="saveProject()">Save</button>
-        <button class="btn btn-save" onclick="loadProject()">Load</button>
         <button class="btn btn-export" onclick="exportToHTML()">Export HTML</button>
     </div>
 </div>
-
 <main>
-    <div class="pane"><div class="pane-header">Editor</div><textarea id="editor" spellcheck="false" oninput="compile()">
-+header/WaveScript/hb:home:"https://wavescr1pt.github.io/"/hb:Docs:#
+    <div class="pane"><div class="pane-header">Editor</div><textarea id="editor" spellcheck="false">
++header/WaveScript/hb:Docs:#
 s/h:72/background:#fff/border-bottom:1px solid #eee/hb:link
 
-+section/WaveScript demopage
-s/h:400/background:linear-gradient(135deg,#0081ff,#004)/color:#fff/display:flex/justify-content:center/align-items:center/font-size:3rem/font-weight:900
++section/WaveScript Hero
+s/h:500/bgimg:https://picsum.photos/1200/800/color:#fff/display:flex/align-items:center/justify-content:center/font-size:3.5rem/font-weight:900
 
-+section/WaveScriptは、シンプルで読みやすい、webページ制作言語です。\n\nこのページも、たった9行で書かれています。
-s/h:300/background:#fff/padding:50px/text-align:center/color:#333
++section/背景画像とセクション幅のテスト。
+s/padding:60px/text-align:center/background:#fff/color:#333/font-size:1.2rem
 </textarea></div>
     <div class="pane pane-preview"><div class="pane-header">Preview</div><div class="canvas-container"><div id="canvas"></div></div></div>
 </main>
-
 <script>
     const editor = document.getElementById('editor');
-    const projectNameInput = document.getElementById('project-name');
-    const storageKeyPrefix = 'ws_project_';
-
-    window.onload = () => {
-        const last = localStorage.getItem('ws_last_opened');
-        if (last) { projectNameInput.value = last; loadProject(); } else { compile(); }
-    };
-
-    function saveProject() {
-        const name = projectNameInput.value.trim() || "Untitled Project";
-        localStorage.setItem(storageKeyPrefix + name, editor.value);
-        localStorage.setItem('ws_last_opened', name);
-        alert('保存しました: ' + name);
-    }
-
-    function loadProject() {
-        const name = projectNameInput.value.trim();
-        const data = localStorage.getItem(storageKeyPrefix + name);
-        if (data) { editor.value = data; compile(); }
-    }
+    const canvas = document.getElementById('canvas');
 
     function compile() {
-        const canvas = document.getElementById('canvas');
         canvas.innerHTML = "";
         let lastEl = null;
 
         editor.value.split('\n').forEach(line => {
             const l = line.trim();
             if (!l || l.startsWith('//')) return;
+
             if (l.startsWith('+')) {
-                const parts = l.split(/(?<!:)\//);
-                const type = parts[0].slice(1).toLowerCase();
-                let el = document.createElement(type === 'header' ? 'div' : 'section');
+                const firstSlash = l.indexOf('/');
+                const type = (firstSlash === -1 ? l.slice(1) : l.slice(1, firstSlash)).toLowerCase();
+                const contentStr = firstSlash === -1 ? "" : l.slice(firstSlash + 1);
+                
+                let el;
                 if (type === 'header') {
-                    el.className = 'ws-h';
-                    const left = document.createElement('div'); left.style.fontWeight="700"; left.textContent = parts[1];
+                    el = document.createElement('div'); el.className = 'ws-h';
+                    const parts = contentStr.split('/');
+                    const left = document.createElement('div'); left.style.fontWeight="700"; left.textContent = parts[0];
                     const right = document.createElement('div'); right.className = 'ws-h-right';
-                    for(let i=2; i<parts.length; i++) {
+                    for(let i=1; i<parts.length; i++) {
                         if(parts[i].startsWith('hb:')) {
                             const pts = parts[i].split(':');
                             const b = document.createElement('a'); b.className = 'hb'; 
-                            b.textContent = pts[1] || ""; 
-                            let url = pts.slice(2).join(':').trim().replace(/^"|"$/g, '');
-                            b.href = url || "#";
-                            if (url.startsWith('http')) { b.target = "_blank"; b.rel = "noopener noreferrer"; }
+                            b.textContent = pts[1] || ""; b.href = pts.slice(2).join(':') || "#";
                             right.appendChild(b);
                         }
                     }
                     el.appendChild(left); el.appendChild(right);
+                } else if (type === 'img') {
+                    el = document.createElement('img'); el.src = contentStr;
                 } else {
-                    el.innerText = (parts[1] || "").split('\\n').join('\n');
+                    el = document.createElement('section');
+                    el.innerText = contentStr.split('\\n').join('\n');
                 }
                 canvas.appendChild(el); lastEl = el;
             } else if (l.startsWith('s/') && lastEl) {
-                l.slice(2).split(/(?<!:)\//).forEach((seg) => {
-                    const pts = seg.split(':');
-                    if (pts.length >= 1) {
-                        let k = pts[0].trim(), v = pts.length > 1 ? pts.slice(1).join(':').trim() : "";
-                        if (k === 'hb' && v === 'link') { lastEl.classList.add('as-link'); return; }
-                        if (k === 'h') k = 'height';
-                        if (v.match(/^\d+$/)) v += 'px';
-                        lastEl.style[k] = v;
+                // スラッシュで分割するが、空文字を除去
+                const segs = l.slice(2).split('/').filter(s => s.length > 0);
+                segs.forEach(seg => {
+                    const colonIdx = seg.indexOf(':');
+                    if (colonIdx === -1) return;
+                    let k = seg.slice(0, colonIdx).trim();
+                    let v = seg.slice(colonIdx + 1).trim();
+
+                    if (k === 'bgimg') { 
+                        lastEl.style.backgroundImage = `url("${v}")`; 
+                        return; 
                     }
+                    if (k === 'h') k = 'height';
+                    
+                    // 数値のみの場合はpxを補完
+                    if (v.match(/^\d+$/)) v += 'px';
+                    lastEl.style[k] = v;
                 });
             }
         });
     }
 
-    function exportToHTML() {
-        const content = document.getElementById('canvas').innerHTML;
-        const name = projectNameInput.value.trim() || "WaveScript Project";
-        
-        // 【決定的な修正】faviconを「使わない」ことをブラウザに明示する設定を追加
-        const fullHTML = `<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${name}</title>
-    <link rel="icon" href="data:,">
-    <style>
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #fff; color: #000; overflow-x: hidden; }
-        #canvas { width: 100%; display: flex; flex-direction: column; }
-        .ws-h { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; position: sticky; top: 0; z-index: 10; backdrop-filter: blur(12px); min-height: 64px; box-sizing: border-box; }
-        .ws-h-right { display: flex; gap: 12px; align-items: center; }
-        .hb { text-decoration: none; font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 6px; background: #0081ff; color: #fff; }
-        .ws-h.as-link .hb { background: transparent !important; color: inherit !important; padding: 4px 8px !important; }
-        section { box-sizing: border-box; display: flex; flex-direction: column; white-space: pre-line; }
-    </style>
-</head>
-<body>
-    <div id="canvas">${content}</div>
-</body>
-</html>`;
-
-        const blob = new Blob([fullHTML], {type: 'text/html'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = name + '.html';
-        a.click();
+    function saveProject() {
+        localStorage.setItem('ws_v1_code', editor.value);
+        alert('Saved!');
     }
+
+    function exportToHTML() {
+        const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>WaveScript</title><style>body{margin:0;font-family:sans-serif;}#canvas{display:flex;flex-direction:column;}.ws-h{display:flex;align-items:center;justify-content:space-between;padding:0 24px;min-height:64px;box-sizing:border-box;}.hb{text-decoration:none;padding:8px 18px;border-radius:6px;background:#0081ff;color:#fff;}.ws-h.as-link .hb{background:transparent!important;color:inherit!important;}section{box-sizing:border-box;display:flex;flex-direction:column;white-space:pre-line;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#eee;}img{max-width:100%;display:block;}</style></head><body><div id="canvas">${canvas.innerHTML}</div></body></html>`;
+        const blob = new Blob([fullHTML], {type:'text/html'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'wavescript.html'; a.click();
+    }
+
+    editor.addEventListener('input', compile);
+    window.onload = () => {
+        const saved = localStorage.getItem('ws_v1_code');
+        if(saved) editor.value = saved;
+        compile();
+    };
 </script>
 </body>
 </html>
