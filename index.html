@@ -2,31 +2,38 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>WaveScript 1.0</title>
+    <title>WaveScript 1.2.5 | Integrated Demo</title>
     <style>
         :root { --bg: #0d0d0d; --panel: #141414; --accent: #0081ff; --border: #222; --text-main: #e0e0e0; --text-sub: #666; --editor-text: #b3d9ff; }
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .nav-bar { height: 48px; background: var(--panel); display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid var(--border); z-index: 100; gap: 16px; }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        .nav-bar { height: 48px; background: var(--panel); display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid var(--border); z-index: 1000; }
         .brand-section { display: flex; align-items: center; gap: 10px; }
         .ws-logo { height: 20px; width: auto; }
         .brand-name { font-size: 13px; font-weight: 700; color: #fff; }
-        #project-name { background: #1a1a1a; border: 1px solid var(--border); color: var(--text-main); padding: 5px 12px; border-radius: 4px; font-size: 12px; width: 200px; outline: none; }
-        .controls { display: flex; gap: 8px; margin-left: auto; }
-        .btn { border: none; padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; color: #fff; }
+        .controls { margin-left: auto; display: flex; gap: 10px; }
+        .btn { border: none; padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; color: #fff; transition: 0.2s; }
+        .btn-save { background: #333; }
         .btn-export { background: var(--accent); }
+
         main { flex: 1; display: flex; overflow: hidden; }
         .pane { flex: 1; display: flex; flex-direction: column; }
         .pane-preview { flex: 1.2; border-left: 1px solid var(--border); }
         .pane-header { font-size: 10px; font-weight: 800; color: var(--text-sub); padding: 10px 20px; text-transform: uppercase; background: var(--panel); border-bottom: 1px solid var(--border); }
-        textarea { flex: 1; background: transparent; color: var(--editor-text); border: none; padding: 24px; font-family: 'Consolas', monospace; font-size: 14px; line-height: 1.6; outline: none; resize: none; }
-        .canvas-container { flex: 1; overflow-y: auto; background: #fff; }
+        textarea { flex: 1; background: transparent; color: var(--editor-text); border: none; padding: 24px; font-family: 'Consolas', 'Monaco', monospace; font-size: 14px; line-height: 1.6; outline: none; resize: none; }
+        
+        .canvas-container { flex: 1; overflow-y: auto; background: #fff; scroll-behavior: smooth; }
         #canvas { width: 100%; min-height: 100%; color: #000; display: flex; flex-direction: column; }
         
-        /* Components */
-        .ws-h { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; min-height: 64px; box-sizing: border-box; }
+        /* Preview Components */
+        .ws-h { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; min-height: 64px; box-sizing: border-box; position: sticky; top: 0; z-index: 100; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
         .ws-h-right { display: flex; gap: 12px; align-items: center; }
-        .hb { text-decoration: none; font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 6px; background: #0081ff; color: #fff; }
-        section { box-sizing: border-box; display: flex; flex-direction: column; white-space: pre-line; background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #eee; }
+        .hb { text-decoration: none; font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 6px; background: #0081ff; color: #fff; display: inline-flex; align-items: center; transition: 0.2s; }
+        .hb:hover { opacity: 0.8; }
+        .hb.text-only { background: transparent !important; color: inherit !important; padding: 4px 8px !important; }
+        
+        section { box-sizing: border-box; display: flex; flex-direction: column; white-space: pre-line; background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #f5f5f5; }
+        img { max-width: 100%; height: auto; display: block; }
     </style>
 </head>
 <body>
@@ -35,22 +42,23 @@
         <svg class="ws-logo" viewBox="0 0 128 128"><rect width="128" height="128" fill="white"/><rect width="128" height="24" fill="#0081FF"/><rect y="24" width="128" height="56" fill="#3D3D3D"/><path d="M12.8 71.68V128H28.416L34.176 100.224L39.808 128H55.424V71.68H43.008V111.872L36.864 82.304H31.36L25.216 111.872V71.68H12.8ZM61.824 116.352L72.448 111.36C73.984 116.096 77.568 118.912 82.816 118.912C88.064 118.912 91.392 116.736 91.392 113.152C91.392 110.08 89.6 108.032 83.328 106.368L77.056 104.704C68.352 102.336 63.872 98.496 63.872 90.944C63.872 82.24 71.296 76.224 82.176 76.224C92.416 76.224 99.456 81.6 100.992 90.56L90.752 94.784C89.472 90.688 86.656 86.912 81.536 86.912C77.056 86.912 74.56 89.088 74.56 91.904C74.56 94.592 76.224 96.128 82.56 97.792L88.832 99.456C98.048 101.888 102.272 105.856 102.272 112.512C102.272 122.24 94.336 129.28 82.432 129.28C71.04 129.28 63.232 123.648 61.824 116.352Z" fill="black"/></svg>
         <span class="brand-name">WaveScript</span>
     </div>
-    <div class="project-meta"><input type="text" id="project-name" value="Production V1"></div>
     <div class="controls">
+        <button class="btn btn-save" onclick="saveToLocal()">Save</button>
         <button class="btn btn-export" onclick="exportToHTML()">Export</button>
     </div>
 </div>
 <main>
-    <div class="pane"><div class="pane-header">Editor</div><textarea id="editor" spellcheck="false">
-+header/WaveScript/hb:Docs:#
+    <div class="pane"><div class="pane-header">Editor</div><textarea id="editor" spellcheck="false">!1:https://images.unsplash.com/photo-1550684848-fac1c5b4e853
+
+// 全てのボタンをlinkにする例:
++header/WaveScript/hb:Home:#/link/hb:About:#/link/hb:Docs:#/link
 s/h:72/background:#fff/border-bottom:1px solid #eee
 
-+section/WaveScript 1.0
-s/h:500/bgimg:"https://images.unsplash.com/photo-1550684848-fac1c5b4e853"/color:#fff/display:flex/align-items:center/justify-content:center/font-size:3.5rem/font-weight:900
++section/WaveScript demopage
+s/h:500/bgimg:1/color:#000000/display:flex/align-items:center/justify-content:center/font-size:3rem/font-weight:900
 
-+section/Quoted URLs are safe!
-s/padding:80px/text-align:center/background:#fff/color:#333/font-size:1.5rem
-</textarea></div>
++section/WaveScriptは、シンプル、簡単なwebページ制作用プログラミング言語です。\nこのデモページはWaveScriptを用いて11行で製作されています。
+s/h:200//color:#000000/display:flex/align-items:center/justify-content:center/font-size:1rem/font-weight:900</textarea></div>
     <div class="pane pane-preview"><div class="pane-header">Preview</div><div class="canvas-container"><div id="canvas"></div></div></div>
 </main>
 <script>
@@ -60,69 +68,89 @@ s/padding:80px/text-align:center/background:#fff/color:#333/font-size:1.5rem
     function compile() {
         canvas.innerHTML = "";
         let lastEl = null;
+        let images = {};
+        const lines = editor.value.split('\n');
 
-        editor.value.split('\n').forEach(line => {
-            const l = line.trim();
-            if (!l || l.startsWith('//')) return;
+        lines.forEach(l => {
+            const line = l.trim();
+            if (line.startsWith('!')) {
+                const cIdx = line.indexOf(':');
+                if (cIdx !== -1) images[line.slice(1, cIdx).trim()] = line.slice(cIdx + 1).trim();
+            }
+        });
 
-            if (l.startsWith('+')) {
-                const firstSlash = l.indexOf('/');
-                const type = (firstSlash === -1 ? l.slice(1) : l.slice(1, firstSlash)).toLowerCase();
-                const contentStr = firstSlash === -1 ? "" : l.slice(firstSlash + 1);
+        lines.forEach(l => {
+            const line = l.trim();
+            if (!line || line.startsWith('//') || line.startsWith('!')) return;
+
+            if (line.startsWith('+')) {
+                const firstSlash = line.indexOf('/');
+                const type = (firstSlash === -1 ? line.slice(1) : line.slice(1, firstSlash)).trim().toLowerCase();
+                const content = firstSlash === -1 ? "" : line.slice(firstSlash + 1);
                 
                 let el;
                 if (type === 'header') {
                     el = document.createElement('div'); el.className = 'ws-h';
-                    const parts = contentStr.split('/');
+                    const parts = content.split('/');
                     const left = document.createElement('div'); left.style.fontWeight="700"; left.textContent = parts[0];
                     const right = document.createElement('div'); right.className = 'ws-h-right';
                     for(let i=1; i<parts.length; i++) {
-                        if(parts[i].startsWith('hb:')) {
-                            const pts = parts[i].split(':');
+                        let p = parts[i].trim();
+                        if(p.startsWith('hb:')) {
+                            const pts = p.split(':');
                             const b = document.createElement('a'); b.className = 'hb'; 
                             b.textContent = pts[1] || ""; b.href = pts.slice(2).join(':') || "#";
+                            if (i + 1 < parts.length && parts[i+1].trim() === "link") {
+                                b.classList.add('text-only');
+                                i++; 
+                            }
                             right.appendChild(b);
                         }
                     }
                     el.appendChild(left); el.appendChild(right);
                 } else if (type === 'img') {
-                    el = document.createElement('img'); el.src = contentStr.replace(/"/g, '');
+                    el = document.createElement('img'); el.src = images[content] || content;
                 } else {
                     el = document.createElement('section');
-                    el.innerText = contentStr.split('\\n').join('\n');
+                    el.innerText = content.split('\\n').join('\n');
                 }
                 canvas.appendChild(el); lastEl = el;
-            } else if (l.startsWith('s/') && lastEl) {
-                // 正規表現で「"で囲まれた部分」または「/」で分割
-                const segs = l.slice(2).match(/(".*?"|[^/ \t]+)+/g);
-                if (!segs) return;
-
+            } else if (line.startsWith('s/') && lastEl) {
+                const segs = line.slice(2).split('/');
                 segs.forEach(seg => {
-                    const colonIdx = seg.indexOf(':');
-                    if (colonIdx === -1) return;
-                    let k = seg.slice(0, colonIdx).trim();
-                    let v = seg.slice(colonIdx + 1).trim().replace(/"/g, ''); // クォーテーションを除去
-
-                    if (k === 'bgimg') { 
-                        lastEl.style.backgroundImage = `url("${v}")`;
-                        return; 
+                    const cIdx = seg.indexOf(':');
+                    if (cIdx === -1) return;
+                    let k = seg.slice(0, cIdx).trim();
+                    let v = seg.slice(cIdx + 1).trim();
+                    if (k === 'bgimg') {
+                        lastEl.style.backgroundImage = `url("${images[v] || v}")`;
+                    } else {
+                        if (k === 'h') k = 'height';
+                        if (v.match(/^\d+$/)) v += 'px';
+                        lastEl.style[k] = v;
                     }
-                    if (k === 'h') k = 'height';
-                    if (v.match(/^\d+$/)) v += 'px';
-                    lastEl.style[k] = v;
                 });
             }
         });
     }
 
+    function saveToLocal() {
+        localStorage.setItem('ws_code_v125', editor.value);
+        alert('Code saved to browser!');
+    }
+
     function exportToHTML() {
-        const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>WaveScript</title><style>body{margin:0;font-family:sans-serif;}#canvas{display:flex;flex-direction:column;}.ws-h{display:flex;align-items:center;justify-content:space-between;padding:0 24px;min-height:64px;box-sizing:border-box;}.hb{text-decoration:none;padding:8px 18px;border-radius:6px;background:#0081ff;color:#fff;}section{box-sizing:border-box;display:flex;flex-direction:column;white-space:pre-line;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#eee;}img{max-width:100%;display:block;}</style></head><body><div id="canvas">${canvas.innerHTML}</div></body></html>`;
+        const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;font-family:sans-serif;}#canvas{display:flex;flex-direction:column;}.ws-h{display:flex;align-items:center;justify-content:space-between;padding:0 24px;min-height:64px;position:sticky;top:0;background:rgba(255,255,255,0.9);backdrop-filter:blur(10px);}.ws-h-right{display:flex;gap:12px;}.hb{text-decoration:none;padding:8px 18px;border-radius:6px;background:#0081ff;color:#fff;}.hb.text-only{background:transparent!important;color:inherit!important;padding:4px 8px!important;}section{box-sizing:border-box;display:flex;flex-direction:column;white-space:pre-line;background-size:cover;background-position:center;background-color:#f5f5f5;}img{max-width:100%;display:block;}</style></head><body><div id="canvas">${canvas.innerHTML}</div></body></html>`;
         const blob = new Blob([fullHTML], {type:'text/html'});
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'index.html'; a.click();
     }
 
     editor.addEventListener('input', compile);
-    window.onload = compile;
+    window.onload = () => {
+        const saved = localStorage.getItem('ws_code_v125');
+        if (saved) editor.value = saved;
+        compile();
+    };
 </script>
 </body>
 </html>
